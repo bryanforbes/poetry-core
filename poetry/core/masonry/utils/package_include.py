@@ -44,9 +44,14 @@ class PackageInclude(Include):
             # Probably glob
             self._is_package = True
 
-            # Packages no longer need an __init__.py in python3, but there must
-            # at least be one .py file for it to be considered a package
-            if not any([element.suffix == ".py" for element in self._elements]):
+            if not (
+                # PEP-561 defines that packages ending in `-stubs` are stub-only
+                # packages regardless if they contain python files or not
+                root.name.endswith("-stubs")
+                # Packages no longer need an __init__.py in python3, but there must
+                # at least be one .py file for it to be considered a package
+                or any([element.suffix == ".py" for element in self._elements])
+            ):
                 raise ValueError("{} is not a package.".format(root.name))
 
             self._package = root.parent.name
@@ -56,7 +61,10 @@ class PackageInclude(Include):
                 self._package = root.name
                 self._elements = sorted(list(root.glob("**/*")))
 
-                if not any([element.suffix == ".py" for element in self._elements]):
+                if not (
+                    root.name.endswith("-stubs")
+                    or any([element.suffix == ".py" for element in self._elements])
+                ):
                     raise ValueError("{} is not a package.".format(root.name))
 
                 self._is_package = True

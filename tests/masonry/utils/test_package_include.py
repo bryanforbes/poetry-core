@@ -14,6 +14,8 @@ def test_package_include_with_multiple_dirs():
         with_includes / "__init__.py",
         with_includes / "bar",
         with_includes / "bar/baz.py",
+        with_includes / "bar-stubs",
+        with_includes / "bar-stubs/baz.pyi",
         with_includes / "extra_package",
         with_includes / "extra_package/some_dir",
         with_includes / "extra_package/some_dir/foo.py",
@@ -34,6 +36,11 @@ def test_package_include_with_nested_dir():
         with_includes / "extra_package/some_dir/foo.py",
         with_includes / "extra_package/some_dir/quux.py",
     ]
+
+
+def test_package_include_with_stub_dir():
+    pkg_include = PackageInclude(base=with_includes, include="bar-stubs")
+    assert pkg_include.elements == [with_includes / "bar-stubs/baz.pyi"]
 
 
 def test_package_include_with_no_python_files_in_dir():
